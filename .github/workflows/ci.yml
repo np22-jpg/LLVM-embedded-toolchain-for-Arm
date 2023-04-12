@@ -51,27 +51,10 @@ jobs:
             -D CMAKE_CXX_COMPILER=clang++
           cmake --build out -j$(nproc)
 
-
-  test_llvm:    
-    needs: build_llvm
-    runs-on: ubuntu-latest
-
-    name: Test LLVM
-    steps:
       - name: Test LLVM
         run:  |
           cmake --build out --target check-llvm-toolchain
 
-
-  package_llvm:
-    needs: build_llvm
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    name: Package LLVM
-    steps:
       - name: Package LLVM
         run:  |
           cmake --build out --target package-llvm-toolchain
