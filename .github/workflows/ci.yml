@@ -48,6 +48,7 @@ jobs:
           cmake -G Ninja -B out . \
             -D FETCHCONTENT_QUIET=ON \
             -D LLVM_ENABLE_LLD=ON \
+            -D LLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lld;lldb;compiler-rt' \
             -D CMAKE_C_COMPILER=clang \
             -D CMAKE_CXX_COMPILER=clang++
           cmake --build out -j$(nproc)
