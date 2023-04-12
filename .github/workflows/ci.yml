@@ -33,7 +33,7 @@ jobs:
         id: cache-build
         uses: actions/cache@v3.3.1
         with:
-          path: /home/runner/work/LLVM-embedded-toolchain-for-Arm/LLVM-embedded-toolchain-for-Arm/out
+          path: /home/runner/work/LLVM-embedded-toolchain-for-Arm/LLVM-embedded-toolchain-for-Arm
           key: ${{ runner.os }}-build
 
       - name: Check out repo
