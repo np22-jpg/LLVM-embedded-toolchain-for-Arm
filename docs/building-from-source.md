@@ -34,6 +34,15 @@ $ brew install llvm python3 git make ninja qemu cmake
 $ pip install meson
 ```
 
+## Customizing
+
+To build additional library variants, edit the `CMakeLists.txt` by adding
+calls to the `add_library_variant` CMake function using existing library
+variant definitions as a template.
+
+To build additional LLVM tools, edit the `CMakeLists.txt` by adding required
+tools to the `LLVM_DISTRIBUTION_COMPONENTS` CMake list.
+
 ## Building
 
 The toolchain can be built directly with CMake.
@@ -69,7 +78,7 @@ ninja check-llvm-toolchain
 
 ### Packaging the toolchain
 
-After building, create a zip or tar.gz file as appropriate for the platform:
+After building, create a zip or tar.xz file as appropriate for the platform:
 ```
 ninja package-llvm-toolchain
 ```
@@ -111,9 +120,5 @@ The same build directory can be used for both native and MinGW toolchains.
 
 ## Divergences from upstream
 
-### picolibc:
-* Added a fix for building with -mthumb
-
-### LLVM:
-* Recognize $@ in a config file argument to mean the directory of the config
-  file, allowing toolchain relative paths.
+See [patches](https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm/tree/main/patches)
+directory for the current set of differences from upstream.

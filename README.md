@@ -36,6 +36,11 @@ that are not supported include:
  - RTTI
  - Multithreading
 
+LLVM Embedded Toolchain for Arm uses the unstable libc++ ABI version. This ABI
+uses all the latest libc++ improvements and bugfixes, but may result in link
+errors when linking against objects compiled against older versions of the ABI.
+For more information see https://libcxx.llvm.org/DesignDocs/ABIVersioning.html.
+
 ## Components
 
 The LLVM Embedded Toolchain for Arm relies on the following upstream components
@@ -73,9 +78,9 @@ and extract the archive into an arbitrary directory.
 On Ubuntu 20.04 and later `libtinfo5` is required: `apt install libtinfo5`.
 (This requirement will be removed in LLVM Embedded Toolchain for Arm 17.)
 
-On macOS the toolchain binaries are quarantined by com.apple.quarantine. To
-run the executables change directory to bin and run the following command to
-remove the com.apple.quarantine:
+Prior to LLVM Embedded Toolchain for Arm 17, on macOS the toolchain binaries
+are quarantined by com.apple.quarantine. To run the executables change directory
+to bin and run the following command to remove the com.apple.quarantine:
 
 ```
 find . -type f -perm +0111 | xargs xattr -d com.apple.quarantine
@@ -83,46 +88,27 @@ find . -type f -perm +0111 | xargs xattr -d com.apple.quarantine
 
 ### Using the toolchain
 
-To use the toolchain, on the command line you need to provide:
-* A [configuration file](
-  https://clang.llvm.org/docs/UsersManual.html#configuration-files) specified
-  with `--config`.
+> *Note:* If you are using the toolchain in a shared environment with untrusted input,
+> make sure it is sufficiently sandboxed.
+
+To use the toolchain, on the command line you need to provide the following options:
+* The target triple.
+* The FPU to use.
+* Disabling C++ exceptions and RTTI that are not supported by the standard library provided yet.
+* The C runtime library: either `crt0` or `crt0-semihost`.
+* The semihosting library, if using `crt0-semihost`.
 * A [linker script](
   https://sourceware.org/binutils/docs/ld/Scripts.html) specified with `-T`.
-  Default `picolibcpp.ld` & `picolibc.ld` scripts are provided and can be used
+  Default `picolibcpp.ld` and `picolibc.ld` scripts are provided and can be used
   directly or included from a [custom linker script](
   https://github.com/picolibc/picolibc/blob/main/doc/linking.md#using-picolibcld).
 
 For example:
-
 ```
 $ PATH=<install-dir>/LLVMEmbeddedToolchainForArm-<revision>/bin:$PATH
-$ clang --config armv6m_soft_nofp_semihost.cfg -T picolibc.ld -o example example.c
-```
-
-The available configuration files can be listed using:
-```
-$ ls <install-dir>/LLVMEmbeddedToolchainForArm-<revision>/bin/*.cfg
-```
-
-> *Note:* If you are using the toolchain in a shared environment with untrusted input,
-> make sure it is sufficiently sandboxed.
-
-### Using the toolchain without config files
-
-Instead of using a config file you can provide a `--sysroot` option specifying
-the directory containing the`include` and `lib` directories of the libraries
-you want to use, in addition to various other required options:
-* The target triple
-* Disabling exceptions and RTTI
-* The `crt0` library - either `crt0` or `crt0-semihost`
-* The semihosting library, if desired.
- For example:
-
-```
 $ clang \
---sysroot=<install-dir>/LLVMEmbeddedToolchainForArm-<revision>/lib/clang-runtimes/arm-none-eabi/armv6m_soft_nofp \
 --target=armv6m-none-eabi \
+-mfpu=none \
 -fno-exceptions \
 -fno-rtti \
 -lcrt0-semihost \
@@ -130,6 +116,46 @@ $ clang \
 -T picolibc.ld \
 -o example example.c
 ```
+
+`clang`'s multilib system will automatically select an appropriate set of
+libraries based on your compile flags. `clang` will emit a warning if no
+appropriate set of libraries can be found.
+
+To display the directory selected by the multilib system, add the flag
+`-print-multi-directory` to your `clang` command line options.
+
+To display all available multilibs run `clang` with the flag `-print-multi-lib`
+and a target triple like `--target=aarch64-none-elf` or `--target=arm-none-eabi`.
+
+It's possible that `clang` will choose a set of libraries that are not the ones
+you want to use. In this case you can bypass the multilib system by providing a
+`--sysroot` option specifying the directory containing the `include` and `lib`
+directories of the libraries you want to use. For example:
+
+```
+$ clang \
+--sysroot=<install-dir>/LLVMEmbeddedToolchainForArm-<revision>/lib/clang-runtimes/arm-none-eabi/armv6m_soft_nofp \
+--target=armv6m-none-eabi \
+-mfpu=none \
+-fno-exceptions \
+-fno-rtti \
+-lcrt0-semihost \
+-lsemihost \
+-T picolibc.ld \
+-o example example.c
+```
+
+The FPU selection can be skipped, but it is not recommended to as the defaults
+are different to GCC ones.
+
+Binary releases of the LLVM Embedded Toolchain for Arm are based on release
+branches of the upstream LLVM Project, thus can safely be used with all tools
+provided by LLVM [releases|https://github.com/llvm/llvm-project/releases]
+of matching version.
+
+See [Migrating from Arm GNU Toolchain](https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm/blob/main/docs/migrating.md)
+for advice on using LLVM Embedded Toolchain for Arm with existing projects
+relying on the Arm GNU Toolchain.
 
 ## Building from source
 
