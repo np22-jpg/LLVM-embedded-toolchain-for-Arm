@@ -42,6 +42,11 @@ jobs:
           repository: 'ARM-software/LLVM-embedded-toolchain-for-Arm'
           clean: 'false'
 
+      - name: Git login
+        run:  |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "gitbot@github.com"
+
       - name: Build LLVM
         run:  |
           git config --global --add safe.directory "*"
