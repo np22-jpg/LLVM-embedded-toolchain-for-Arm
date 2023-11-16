@@ -42,17 +42,13 @@ jobs:
           repository: 'ARM-software/LLVM-embedded-toolchain-for-Arm'
           clean: 'false'
 
-      - name: Git login
-        run:  |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "gitbot@github.com"
+      - uses: fregante/setup-git-user@v2
 
       - name: Build LLVM
         run:  |
           git config --global --add safe.directory "*"
           cmake -G Ninja -B out . \
             -D FETCHCONTENT_QUIET=ON \
-            -D LLVM_ENABLE_LLD=ON \
             -D LLVM_ENABLE_PROJECTS='clang;lld;lldb' \
             -D CMAKE_C_COMPILER=clang \
             -D CMAKE_CXX_COMPILER=clang++
