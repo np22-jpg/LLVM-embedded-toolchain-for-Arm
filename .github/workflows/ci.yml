@@ -42,7 +42,10 @@ jobs:
           repository: 'ARM-software/LLVM-embedded-toolchain-for-Arm'
           clean: 'false'
 
-      - uses: fregante/setup-git-user@v2
+      - name: Git login
+        run:  |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "gitbot@github.com"
 
       - name: Build LLVM
         run:  |
