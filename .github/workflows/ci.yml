@@ -23,18 +23,23 @@ jobs:
 
       - name: Download dependencies and refresh metadata
         run:  |
-          dnf install qemu cmake make git clang lld ninja-build python3-pip git-core -y \
+          dnf install qemu cmake make git clang lld ninja-build python3-pip git-core ccache -y \
             --setopt install_weak_deps=false \
             --setopt keepcache=true \
             --nodocs
           pip3 install meson
 
-      - name: Cache build
-        id: cache-build
-        uses: actions/cache@v3.3.1
+      # - name: Cache build
+      #   id: cache-build
+      #   uses: actions/cache@v3.3.1
+      #   with:
+      #     path: /home/runner/work/LLVM-embedded-toolchain-for-Arm/LLVM-embedded-toolchain-for-Arm
+      #     key: ${{ runner.os }}-build
+
+      - name: CCache build
+        uses: hendrikmuhs/ccache-action@v1.2
         with:
-          path: /home/runner/work/LLVM-embedded-toolchain-for-Arm/LLVM-embedded-toolchain-for-Arm
-          key: ${{ runner.os }}-build
+          key: ${{ runner.os }}-ccache
 
       - name: Check out repo
         uses: actions/checkout@v3
@@ -54,7 +59,8 @@ jobs:
             -D FETCHCONTENT_QUIET=ON \
             -D LLVM_ENABLE_PROJECTS='clang;lld;lldb' \
             -D CMAKE_C_COMPILER=clang \
-            -D CMAKE_CXX_COMPILER=clang++
+            -D CMAKE_CXX_COMPILER=clang++ \
+            -D LLVM_CCACHE_BUILD=ON
           cmake --build out -j$(nproc)
 
       - name: Test LLVM
