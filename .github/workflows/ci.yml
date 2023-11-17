@@ -64,8 +64,9 @@ jobs:
       - name: Package LLVM
         run:  |
           cmake --build out --target package-llvm-toolchain
+          ls
 
       - uses: actions/upload-artifact@v3
         with:
           name: toolchain-picolibc-arm-none-eabi.tar.gz
-          path: out/LLVMEmbeddedToolchainForArm-*-Linux-x86_64.tar.gz
+          path: out/*.tar.gz
