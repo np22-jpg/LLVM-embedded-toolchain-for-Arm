@@ -9,7 +9,7 @@ jobs:
   build_llvm:
     runs-on: ubuntu-latest
     container:
-      image: registry.fedoraproject.org/fedora:latest
+      image: quay.io/centos/centos:stream9
       options: --privileged --device /dev/fuse:rw --security-opt label=disable --security-opt seccomp=unconfined
 
     name: Build LLVM
