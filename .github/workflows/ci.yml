@@ -56,7 +56,6 @@ jobs:
         run:  |
           git config --global --add safe.directory "*"
           cmake -G Ninja -B out . \
-            -D FETCHCONTENT_QUIET=ON \
             -D LLVM_ENABLE_PROJECTS='clang;lld;lldb' \
             -D CMAKE_C_COMPILER=clang \
             -D CMAKE_CXX_COMPILER=clang++ \
